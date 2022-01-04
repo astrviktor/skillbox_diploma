@@ -82,10 +82,9 @@ var tests = []struct {
 
 func TestStatusSMS(t *testing.T) {
 	for _, test := range tests {
-		tc := test
-		t.Run(tc.name, func(t *testing.T) {
-			result := StatusSMS(tc.input)
-			require.Equal(t, tc.expected, result)
+		t.Run(test.name, func(t *testing.T) {
+			result := StatusSMS(test.input)
+			require.Equal(t, test.expected, result)
 		})
 	}
 }
