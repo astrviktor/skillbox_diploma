@@ -142,7 +142,7 @@ var tests = []struct {
 	},
 }
 
-func TestStatusSMS(t *testing.T) {
+func TestStatusBilling(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			result, ok := StatusBilling(test.input)

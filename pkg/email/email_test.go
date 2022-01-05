@@ -43,7 +43,7 @@ var tests = []struct {
 	},
 }
 
-func TestStatusVoiceCall(t *testing.T) {
+func TestStatusEmail(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			result := StatusEmail(test.input)
