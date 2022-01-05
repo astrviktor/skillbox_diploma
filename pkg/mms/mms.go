@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"skillbox_diploma/pkg/checker"
+	"skillbox_diploma/pkg/check"
 )
 
 type MMSData struct {
@@ -15,26 +15,39 @@ type MMSData struct {
 	ResponseTime string `json:"response_time"`
 }
 
-func CheckMMS(data []MMSData) []MMSData {
+func CheckMMSData(data []MMSData) []MMSData {
 	result := make([]MMSData, 0)
 
 	for _, elem := range data {
-		if checker.CheckCountry(elem.Country) && checker.CheckBandwidth(elem.Bandwidth) &&
-			checker.CheckResponseTime(elem.ResponseTime) && checker.CheckProvider(elem.Provider) {
-			result = append(result, elem)
+		if !check.IsCountry(elem.Country) {
+			continue
 		}
+
+		if !check.IsBandwidth(elem.Bandwidth) {
+			continue
+		}
+
+		if !check.IsResponseTime(elem.ResponseTime) {
+			continue
+		}
+
+		if !check.IsProviderSMSandMMS(elem.Provider) {
+			continue
+		}
+
+		result = append(result, elem)
 	}
 
 	return result
 }
 
 func StatusMMS(url string) []MMSData {
-	mmsData := make([]MMSData, 0)
+	result := make([]MMSData, 0)
 
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Println(err.Error() + `: ` + url)
-		return mmsData
+		return []MMSData{}
 	}
 	defer resp.Body.Close()
 
@@ -48,9 +61,9 @@ func StatusMMS(url string) []MMSData {
 		return []MMSData{}
 	}
 
-	if err := json.Unmarshal(body, &mmsData); err != nil {
+	if err := json.Unmarshal(body, &result); err != nil {
 		return []MMSData{}
 	}
 
-	return CheckMMS(mmsData)
+	return CheckMMSData(result)
 }

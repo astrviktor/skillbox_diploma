@@ -9,7 +9,7 @@ import (
 )
 
 func TestStatusSMS(t *testing.T) {
-	t.Run("Тест MMS http codes 200 and 500", func(t *testing.T) {
+	t.Run("Тест MMS http коды 200 и 500", func(t *testing.T) {
 		handlerHttp := &TestHandler{}
 
 		ts := httptest.NewServer(handlerHttp)
@@ -46,11 +46,11 @@ func (m *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "/mms/ok":
 		response, _ := json.Marshal(testData)
 		w.WriteHeader(http.StatusOK)
-		w.Write(response)
+		_, _ = w.Write(response)
 	case "/mms/fail":
 		response, _ := json.Marshal(testData)
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(response)
+		_, _ = w.Write(response)
 	default:
 		w.WriteHeader(http.StatusNotFound)
 	}

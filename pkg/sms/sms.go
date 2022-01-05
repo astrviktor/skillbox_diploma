@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"skillbox_diploma/pkg/checker"
+	"skillbox_diploma/pkg/check"
 	"strings"
 )
 
@@ -15,8 +15,45 @@ type SMSData struct {
 	Provider     string
 }
 
+func ParseSMSData(line string) (SMSData, bool) {
+	data := strings.Split(line, ";")
+
+	if len(data) != 4 {
+		return SMSData{}, false
+	}
+
+	Country := data[0]
+	if !check.IsCountry(Country) {
+		return SMSData{}, false
+	}
+
+	Bandwidth := data[1]
+	if !check.IsBandwidth(Bandwidth) {
+		return SMSData{}, false
+	}
+
+	ResponseTime := data[2]
+	if !check.IsResponseTime(ResponseTime) {
+		return SMSData{}, false
+	}
+
+	Provider := data[3]
+	if !check.IsProviderSMSandMMS(Provider) {
+		return SMSData{}, false
+	}
+
+	elem := SMSData{
+		Country:      Country,
+		Bandwidth:    Bandwidth,
+		ResponseTime: ResponseTime,
+		Provider:     Provider,
+	}
+
+	return elem, true
+}
+
 func StatusSMS(csvFile string) []SMSData {
-	smsData := make([]SMSData, 0)
+	result := make([]SMSData, 0)
 
 	file, err := os.Open(csvFile)
 	if err != nil {
@@ -29,18 +66,12 @@ func StatusSMS(csvFile string) []SMSData {
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		data := strings.Split(line, ";")
+		elem, ok := ParseSMSData(line)
 
-		if len(data) != 4 {
-			continue
-		}
-
-		if checker.CheckCountry(data[0]) && checker.CheckBandwidth(data[1]) && checker.CheckResponseTime(data[2]) &&
-			checker.CheckProvider(data[3]) {
-			elem := SMSData{Country: data[0], Bandwidth: data[1], ResponseTime: data[2], Provider: data[3]}
-			smsData = append(smsData, elem)
+		if ok {
+			result = append(result, elem)
 		}
 	}
 
-	return smsData
+	return result
 }
