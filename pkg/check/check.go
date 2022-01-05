@@ -66,6 +66,12 @@ func IsProviderVoiceCall(provider string) bool {
 	return contains(providers, provider)
 }
 
+func IsProviderEmail(provider string) bool {
+	providers := []string{"Gmail", "Yahoo", "Hotmail", "MSN", "Orange", "Comcast", "AOL",
+		"Live", "RediffMail", "GMX", "Protonmail", "Yandex", "Mail.ru"}
+	return contains(providers, provider)
+}
+
 func IsPositiveInt(value string) bool {
 	i, err := strconv.Atoi(value)
 	if err != nil {
