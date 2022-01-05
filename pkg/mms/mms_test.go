@@ -48,9 +48,8 @@ func (m *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write(response)
 	case "/mms/fail":
-		response, _ := json.Marshal(testData)
 		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write(response)
+		_, _ = w.Write([]byte(""))
 	default:
 		w.WriteHeader(http.StatusNotFound)
 	}
