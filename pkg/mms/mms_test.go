@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestStatusSMS(t *testing.T) {
+func TestStatusMMS(t *testing.T) {
 	t.Run("Тест MMS http коды 200 и 500", func(t *testing.T) {
 		handlerHttp := &TestHandler{}
 
