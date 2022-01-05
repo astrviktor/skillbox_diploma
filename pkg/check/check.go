@@ -1,8 +1,8 @@
-package checker
+package check
 
 import "strconv"
 
-func CheckCountry(country string) bool {
+func IsCountry(country string) bool {
 	countries := []string{
 		"AF", "AX", "AL", "DZ", "AS", "AD", "AO", "AI", "AQ", "AG", "AR", "AM", "AW", "AU", "AT", "AZ", "BS", "BH",
 		"BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BQ", "BA", "BW", "BV", "BR", "IO", "BN", "BG", "BF",
@@ -21,7 +21,7 @@ func CheckCountry(country string) bool {
 	return contains(countries, country)
 }
 
-func CheckBandwidth(bandwidth string) bool {
+func IsBandwidth(bandwidth string) bool {
 	i, err := strconv.Atoi(bandwidth)
 	if err != nil {
 		return false
@@ -34,7 +34,7 @@ func CheckBandwidth(bandwidth string) bool {
 	return false
 }
 
-func CheckResponseTime(time string) bool {
+func IsResponseTime(time string) bool {
 	i, err := strconv.Atoi(time)
 	if err != nil {
 		return false
@@ -47,16 +47,47 @@ func CheckResponseTime(time string) bool {
 	return false
 }
 
-func CheckProvider(provider string) bool {
-	providers := []string{"Topolo", "Rond", "Kildy"}
-	return contains(providers, provider)
-}
-
 func contains(s []string, e string) bool {
 	for _, a := range s {
 		if a == e {
 			return true
 		}
 	}
+	return false
+}
+
+func IsProviderSMSandMMS(provider string) bool {
+	providers := []string{"Topolo", "Rond", "Kildy"}
+	return contains(providers, provider)
+}
+
+func IsProviderVoiceCall(provider string) bool {
+	providers := []string{"TransparentCalls", "E-Voice", "JustPhone"}
+	return contains(providers, provider)
+}
+
+func IsPositiveInt(value string) bool {
+	i, err := strconv.Atoi(value)
+	if err != nil {
+		return false
+	}
+
+	if i >= 0 {
+		return true
+	}
+
+	return false
+}
+
+func IsPositiveFloat(value string) bool {
+	f, err := strconv.ParseFloat(value, 32)
+	if err != nil {
+		return false
+	}
+
+	if f >= 0 {
+		return true
+	}
+
 	return false
 }
