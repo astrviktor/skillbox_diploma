@@ -10,14 +10,14 @@ import (
 )
 
 type VoiceCallData struct {
-	Country             string
-	Bandwidth           string
-	ResponseTime        string
-	Provider            string
-	ConnectionStability float32
-	TTFB                int
-	VoicePurity         int
-	MedianOfCallsTime   int
+	Country             string  `json:"country"`
+	Bandwidth           string  `json:"bandwidth"`
+	ResponseTime        string  `json:"response_time"`
+	Provider            string  `json:"provider"`
+	ConnectionStability float32 `json:"connection_stability"`
+	TTFB                int     `json:"ttfb"`
+	VoicePurity         int     `json:"voice_purity"`
+	MedianOfCallsTime   int     `json:"median_of_call_time"`
 }
 
 func ParseVoiceCallData(line string) (VoiceCallData, bool) {

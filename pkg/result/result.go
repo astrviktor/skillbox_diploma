@@ -1,7 +1,7 @@
 package result
 
 import (
-	"skillbox_diploma/pkg/simulator"
+	"skillbox_diploma/pkg/config"
 	"skillbox_diploma/pkg/status/billing"
 	"skillbox_diploma/pkg/status/email"
 	"skillbox_diploma/pkg/status/incident"
@@ -10,6 +10,7 @@ import (
 	"skillbox_diploma/pkg/status/support"
 	"skillbox_diploma/pkg/status/voicecall"
 	"sort"
+	"time"
 )
 
 type ResultT struct {
@@ -44,7 +45,7 @@ var (
 )
 
 func getSMSStat() {
-	smsDataProviderSort := sms.StatusSMS(simulator.SMSDir)
+	smsDataProviderSort := sms.StatusSMS(config.GlobalConfig.SMSFile)
 	smsDataCountrySort := smsDataProviderSort
 
 	smsDataProviderSort = sms.SMSChangeCodeToCountry(smsDataProviderSort)
@@ -66,7 +67,7 @@ func getSMSStat() {
 }
 
 func getMMSStat() {
-	mmsDataProviderSort := mms.StatusMMS(simulator.MMSAddr)
+	mmsDataProviderSort := mms.StatusMMS(config.GlobalConfig.MMSAddr)
 	mmsDataCountrySort := mmsDataProviderSort
 
 	mmsDataProviderSort = mms.MMSChangeCodeToCountry(mmsDataProviderSort)
@@ -88,14 +89,14 @@ func getMMSStat() {
 }
 
 func getVoiceCallStat() {
-	result := voicecall.StatusVoiceCall(simulator.VoiceCallDir)
+	result := voicecall.StatusVoiceCall(config.GlobalConfig.VoiceCallFile)
 	voiceCallChan <- result
 }
 
 func getEmailStat() {
 	result := make(map[string][][]email.EmailData, 0)
 
-	data := email.StatusEmail(simulator.EmailDir)
+	data := email.StatusEmail(config.GlobalConfig.EmailFile)
 
 	countries := make(map[string]int)
 	for _, elem := range data {
@@ -114,14 +115,18 @@ func getEmailStat() {
 }
 
 func getBillingStat() {
-	result := billing.StatusBilling(simulator.BillingDir)
+	result := billing.StatusBilling(config.GlobalConfig.BillingFile)
 	billingChan <- result
 }
 
 func getSupportStat() {
-	result := make([]int, 2)
+	result := make([]int, 0)
 
-	data := support.StatusSupport(simulator.SupportAddr)
+	data := support.StatusSupport(config.GlobalConfig.SupportAddr)
+	if len(data) == 0 {
+		supportChan <- result
+		return
+	}
 
 	amountActiveTickets := 0
 	for _, elem := range data {
@@ -146,7 +151,7 @@ func getSupportStat() {
 }
 
 func getIncidentsStat() {
-	result := incident.StatusIncident(simulator.IncidentAddr)
+	result := incident.StatusIncident(config.GlobalConfig.IncidentAddr)
 
 	sort.SliceStable(result, func(i, j int) bool {
 		return result[i].Status < result[j].Status
@@ -156,7 +161,10 @@ func getIncidentsStat() {
 }
 
 func GetResultData() ResultSetT {
-	result := ResultSetT{}
+	res, ok := GetFromCache()
+	if ok {
+		return res
+	}
 
 	go getSMSStat()
 	go getMMSStat()
@@ -166,13 +174,30 @@ func GetResultData() ResultSetT {
 	go getSupportStat()
 	go getIncidentsStat()
 
-	result.SMS = <-smsChan
-	result.MMS = <-mmsChan
-	result.VoiceCall = <-voiceCallChan
-	result.Email = <-emailChan
-	result.Billing = <-billingChan
-	result.Support = <-supportChan
-	result.Incidents = <-incidentsChan
+	res.SMS = <-smsChan
+	res.MMS = <-mmsChan
+	res.VoiceCall = <-voiceCallChan
+	res.Email = <-emailChan
+	res.Billing = <-billingChan
+	res.Support = <-supportChan
+	res.Incidents = <-incidentsChan
 
-	return result
+	SetToCache(res, time.Now())
+	return res
+}
+
+func CheckResult(r ResultSetT) bool {
+	if len(r.MMS[0]) == 0 && len(r.MMS[1]) == 0 {
+		return false
+	}
+
+	if len(r.Support) == 0 {
+		return false
+	}
+
+	if len(r.Incidents) == 0 {
+		return false
+	}
+
+	return true
 }
