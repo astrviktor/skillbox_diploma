@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"skillbox_diploma/pkg/check"
+	"skillbox_diploma/pkg/status/check"
 )
 
 type MMSData struct {
@@ -13,6 +13,18 @@ type MMSData struct {
 	Provider     string `json:"provider"`
 	Bandwidth    string `json:"bandwidth"`
 	ResponseTime string `json:"response_time"`
+}
+
+func MMSChangeCodeToCountry(data []MMSData) []MMSData {
+	res := make([]MMSData, 0)
+
+	for _, elem := range data {
+		country := check.GetCountryForCode(elem.Country)
+		elem.Country = country
+		res = append(res, elem)
+	}
+
+	return res
 }
 
 func CheckMMSData(data []MMSData) []MMSData {
