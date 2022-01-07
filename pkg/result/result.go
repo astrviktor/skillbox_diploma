@@ -1,0 +1,178 @@
+package result
+
+import (
+	"skillbox_diploma/pkg/simulator"
+	"skillbox_diploma/pkg/status/billing"
+	"skillbox_diploma/pkg/status/email"
+	"skillbox_diploma/pkg/status/incident"
+	"skillbox_diploma/pkg/status/mms"
+	"skillbox_diploma/pkg/status/sms"
+	"skillbox_diploma/pkg/status/support"
+	"skillbox_diploma/pkg/status/voicecall"
+	"sort"
+)
+
+type ResultT struct {
+	Status bool `json:"status"` // true, если все этапы сбора данных прошли успешно,
+	// false во всех остальных случаях
+
+	Data ResultSetT `json:"data"` // заполнен, если все этапы сбора	данных прошли успешно,
+	// nil во всех остальных случаях
+
+	Error string `json:"error"` // пустая строка если все этапы сбора данных прошли успешно,
+	// в случае ошибки заполнено текстом ошибки ( детали ниже )
+}
+
+type ResultSetT struct {
+	SMS       [][]sms.SMSData                `json:"sms"`
+	MMS       [][]mms.MMSData                `json:"mms"`
+	VoiceCall []voicecall.VoiceCallData      `json:"voice_call"`
+	Email     map[string][][]email.EmailData `json:"email"`
+	Billing   billing.BillingData            `json:"billing"`
+	Support   []int                          `json:"support"`
+	Incidents []incident.IncidentData        `json:"incident"`
+}
+
+var (
+	smsChan       = make(chan [][]sms.SMSData, 0)
+	mmsChan       = make(chan [][]mms.MMSData, 0)
+	voiceCallChan = make(chan []voicecall.VoiceCallData, 0)
+	emailChan     = make(chan map[string][][]email.EmailData, 0)
+	billingChan   = make(chan billing.BillingData, 0)
+	supportChan   = make(chan []int, 0)
+	incidentsChan = make(chan []incident.IncidentData, 0)
+)
+
+func getSMSStat() {
+	smsDataProviderSort := sms.StatusSMS(simulator.SMSDir)
+	smsDataCountrySort := smsDataProviderSort
+
+	smsDataProviderSort = sms.SMSChangeCodeToCountry(smsDataProviderSort)
+	smsDataCountrySort = sms.SMSChangeCodeToCountry(smsDataCountrySort)
+
+	sort.SliceStable(smsDataProviderSort, func(i, j int) bool {
+		return smsDataProviderSort[i].Provider < smsDataProviderSort[j].Provider
+	})
+
+	sort.SliceStable(smsDataCountrySort, func(i, j int) bool {
+		return smsDataCountrySort[i].Country < smsDataCountrySort[j].Country
+	})
+
+	var result [][]sms.SMSData
+	result = append(result, smsDataProviderSort)
+	result = append(result, smsDataCountrySort)
+
+	smsChan <- result
+}
+
+func getMMSStat() {
+	mmsDataProviderSort := mms.StatusMMS(simulator.MMSAddr)
+	mmsDataCountrySort := mmsDataProviderSort
+
+	mmsDataProviderSort = mms.MMSChangeCodeToCountry(mmsDataProviderSort)
+	mmsDataCountrySort = mms.MMSChangeCodeToCountry(mmsDataCountrySort)
+
+	sort.SliceStable(mmsDataProviderSort, func(i, j int) bool {
+		return mmsDataProviderSort[i].Provider < mmsDataProviderSort[j].Provider
+	})
+
+	sort.SliceStable(mmsDataCountrySort, func(i, j int) bool {
+		return mmsDataCountrySort[i].Country < mmsDataCountrySort[j].Country
+	})
+
+	var result [][]mms.MMSData
+	result = append(result, mmsDataProviderSort)
+	result = append(result, mmsDataCountrySort)
+
+	mmsChan <- result
+}
+
+func getVoiceCallStat() {
+	result := voicecall.StatusVoiceCall(simulator.VoiceCallDir)
+	voiceCallChan <- result
+}
+
+func getEmailStat() {
+	result := make(map[string][][]email.EmailData, 0)
+
+	data := email.StatusEmail(simulator.EmailDir)
+
+	countries := make(map[string]int)
+	for _, elem := range data {
+		countries[elem.Country]++
+	}
+
+	for countryCode, _ := range countries {
+		var emailDataItem [][]email.EmailData
+		emailDataItem = append(emailDataItem, email.Get3MinDeliveryTimeByCountry(data, countryCode))
+		emailDataItem = append(emailDataItem, email.Get3MaxDeliveryTimeByCountry(data, countryCode))
+
+		result[countryCode] = emailDataItem
+	}
+
+	emailChan <- result
+}
+
+func getBillingStat() {
+	result := billing.StatusBilling(simulator.BillingDir)
+	billingChan <- result
+}
+
+func getSupportStat() {
+	result := make([]int, 2)
+
+	data := support.StatusSupport(simulator.SupportAddr)
+
+	amountActiveTickets := 0
+	for _, elem := range data {
+		amountActiveTickets += elem.ActiveTickets
+	}
+
+	loading := 0
+	switch {
+	case amountActiveTickets < 9:
+		loading = 1
+	case amountActiveTickets >= 9 && amountActiveTickets <= 16:
+		loading = 2
+	case amountActiveTickets > 16:
+		loading = 3
+	}
+	result = append(result, loading)
+
+	averageTime := amountActiveTickets * 60 / 18
+	result = append(result, averageTime)
+
+	supportChan <- result
+}
+
+func getIncidentsStat() {
+	result := incident.StatusIncident(simulator.IncidentAddr)
+
+	sort.SliceStable(result, func(i, j int) bool {
+		return result[i].Status < result[j].Status
+	})
+
+	incidentsChan <- result
+}
+
+func GetResultData() ResultSetT {
+	result := ResultSetT{}
+
+	go getSMSStat()
+	go getMMSStat()
+	go getVoiceCallStat()
+	go getEmailStat()
+	go getBillingStat()
+	go getSupportStat()
+	go getIncidentsStat()
+
+	result.SMS = <-smsChan
+	result.MMS = <-mmsChan
+	result.VoiceCall = <-voiceCallChan
+	result.Email = <-emailChan
+	result.Billing = <-billingChan
+	result.Support = <-supportChan
+	result.Incidents = <-incidentsChan
+
+	return result
+}

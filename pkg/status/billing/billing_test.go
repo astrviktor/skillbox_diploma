@@ -9,7 +9,6 @@ var tests = []struct {
 	name     string
 	input    string
 	expected BillingData
-	ok       bool
 }{
 	{
 		name:  "Тест Billing пример из PDF",
@@ -22,7 +21,6 @@ var tests = []struct {
 			FraudControl:   true,
 			CheckoutPage:   true,
 		},
-		ok: true,
 	},
 	{
 		name:  "Тест Billing из симулятора",
@@ -35,7 +33,6 @@ var tests = []struct {
 			FraudControl:   false,
 			CheckoutPage:   false,
 		},
-		ok: true,
 	},
 	{
 		name:  "Тест Billing 1",
@@ -48,7 +45,6 @@ var tests = []struct {
 			FraudControl:   false,
 			CheckoutPage:   false,
 		},
-		ok: true,
 	},
 	{
 		name:  "Тест Billing 2",
@@ -61,7 +57,6 @@ var tests = []struct {
 			FraudControl:   false,
 			CheckoutPage:   false,
 		},
-		ok: true,
 	},
 	{
 		name:  "Тест Billing 3",
@@ -74,7 +69,6 @@ var tests = []struct {
 			FraudControl:   false,
 			CheckoutPage:   false,
 		},
-		ok: true,
 	},
 	{
 		name:  "Тест Billing 4",
@@ -87,7 +81,6 @@ var tests = []struct {
 			FraudControl:   false,
 			CheckoutPage:   false,
 		},
-		ok: true,
 	},
 	{
 		name:  "Тест Billing 5",
@@ -100,7 +93,6 @@ var tests = []struct {
 			FraudControl:   true,
 			CheckoutPage:   false,
 		},
-		ok: true,
 	},
 	{
 		name:  "Тест Billing 6",
@@ -113,7 +105,6 @@ var tests = []struct {
 			FraudControl:   false,
 			CheckoutPage:   true,
 		},
-		ok: true,
 	},
 	{
 		name:  "Тест Billing All",
@@ -126,28 +117,24 @@ var tests = []struct {
 			FraudControl:   true,
 			CheckoutPage:   true,
 		},
-		ok: true,
 	},
 	{
 		name:     "Тест Billing err1",
 		input:    "testdata/billing-err1.data",
 		expected: BillingData{},
-		ok:       false,
 	},
 	{
 		name:     "Тест Billing err2",
 		input:    "testdata/billing-err2.data",
 		expected: BillingData{},
-		ok:       false,
 	},
 }
 
 func TestStatusBilling(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result, ok := StatusBilling(test.input)
+			result := StatusBilling(test.input)
 			require.Equal(t, test.expected, result)
-			require.Equal(t, test.ok, ok)
 		})
 	}
 }

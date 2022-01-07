@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"skillbox_diploma/pkg/check"
+	"skillbox_diploma/pkg/status/check"
 	"strconv"
 	"strings"
 )

@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"skillbox_diploma/pkg/check"
+	"skillbox_diploma/pkg/status/check"
 	"strings"
 )
 
@@ -13,6 +13,18 @@ type SMSData struct {
 	Bandwidth    string
 	ResponseTime string
 	Provider     string
+}
+
+func SMSChangeCodeToCountry(data []SMSData) []SMSData {
+	res := make([]SMSData, 0)
+
+	for _, elem := range data {
+		country := check.GetCountryForCode(elem.Country)
+		elem.Country = country
+		res = append(res, elem)
+	}
+
+	return res
 }
 
 func ParseSMSData(line string) (SMSData, bool) {
