@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/astrviktor/skillbox_diploma/pkg/config"
+	"github.com/astrviktor/skillbox_diploma/pkg/server"
+	"github.com/astrviktor/skillbox_diploma/pkg/simulator"
 	"os"
 	"os/signal"
-	"skillbox_diploma/pkg/config"
-	"skillbox_diploma/pkg/server"
-	"skillbox_diploma/pkg/simulator"
 	"syscall"
 )
 

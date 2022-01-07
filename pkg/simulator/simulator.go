@@ -1,12 +1,12 @@
 package simulator
 
 import (
+	"github.com/astrviktor/skillbox_diploma/pkg/config"
 	"github.com/gorilla/mux"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
-	"skillbox_diploma/pkg/config"
 	"time"
 )
 

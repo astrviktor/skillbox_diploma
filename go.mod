@@ -1,4 +1,4 @@
-module skillbox_diploma
+module  github.com/astrviktor/skillbox_diploma
 
 go 1.16
 

@@ -3,9 +3,9 @@ package mms
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/astrviktor/skillbox_diploma/pkg/status/check"
 	"io/ioutil"
 	"net/http"
-	"skillbox_diploma/pkg/status/check"
 )
 
 type MMSData struct {
