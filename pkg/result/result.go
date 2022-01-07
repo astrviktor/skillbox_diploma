@@ -1,14 +1,14 @@
 package result
 
 import (
-	"skillbox_diploma/pkg/config"
-	"skillbox_diploma/pkg/status/billing"
-	"skillbox_diploma/pkg/status/email"
-	"skillbox_diploma/pkg/status/incident"
-	"skillbox_diploma/pkg/status/mms"
-	"skillbox_diploma/pkg/status/sms"
-	"skillbox_diploma/pkg/status/support"
-	"skillbox_diploma/pkg/status/voicecall"
+	"github.com/astrviktor/skillbox_diploma/pkg/config"
+	"github.com/astrviktor/skillbox_diploma/pkg/status/billing"
+	"github.com/astrviktor/skillbox_diploma/pkg/status/email"
+	"github.com/astrviktor/skillbox_diploma/pkg/status/incident"
+	"github.com/astrviktor/skillbox_diploma/pkg/status/mms"
+	"github.com/astrviktor/skillbox_diploma/pkg/status/sms"
+	"github.com/astrviktor/skillbox_diploma/pkg/status/support"
+	"github.com/astrviktor/skillbox_diploma/pkg/status/voicecall"
 	"sort"
 	"time"
 )

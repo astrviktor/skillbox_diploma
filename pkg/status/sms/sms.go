@@ -3,8 +3,8 @@ package sms
 import (
 	"bufio"
 	"fmt"
+	"github.com/astrviktor/skillbox_diploma/pkg/status/check"
 	"os"
-	"skillbox_diploma/pkg/status/check"
 	"strings"
 )
 

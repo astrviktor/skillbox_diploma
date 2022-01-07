@@ -2,10 +2,10 @@ package server
 
 import (
 	"encoding/json"
+	"github.com/astrviktor/skillbox_diploma/pkg/result"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	"skillbox_diploma/pkg/result"
 )
 
 const serverAddr = "127.0.0.1:8888"

@@ -3,8 +3,8 @@ package email
 import (
 	"bufio"
 	"fmt"
+	"github.com/astrviktor/skillbox_diploma/pkg/status/check"
 	"os"
-	"skillbox_diploma/pkg/status/check"
 	"sort"
 	"strconv"
 	"strings"
