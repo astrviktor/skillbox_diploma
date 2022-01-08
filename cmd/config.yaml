@@ -1,4 +1,4 @@
-simulator_addr: 127.0.0.1:9999
+addr: :9999
 sms_file: data/sms.data
 mms_addr: http://127.0.0.1:9999/mms
 mms_file: data/mms.json
@@ -9,3 +9,4 @@ support_addr: http://127.0.0.1:9999/support
 support_file: data/support.json
 incident_addr: http://127.0.0.1:9999/incident
 incident_file: data/incident.json
+web_dir: web

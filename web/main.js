@@ -1,5 +1,6 @@
 (function(){
-    let apiPath = 'http://127.0.0.1:8888/api';
+    let apiPath = 'https://statuspage-skillbox.herokuapp.com/api';
+    //let apiPath = 'http://127.0.0.1:9999/api';
     //let apiPath = 'response/error.json';
 
     let dataScheme = {
