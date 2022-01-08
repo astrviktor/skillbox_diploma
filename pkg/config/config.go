@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
+	"os"
 )
 
 type Config struct {
@@ -61,6 +62,16 @@ func GetDefaultConfig() Config {
 	config.IncidentAddr = "http://" + addr + "/incident"
 	config.IncidentFile = dir + "incident.json"
 	config.WebDir = "/home/astrviktor/golang/src/skillbox_diploma/web"
+
+	return config
+}
+
+func ForHerokuConfig(config Config) Config {
+	port := os.Getenv("PORT")
+	config.Addr = ":" + port
+	config.MMSAddr = "http://127.0.0.1:" + port + "/mms"
+	config.SupportAddr = "http://127.0.0.1:" + port + "/support"
+	config.IncidentAddr = "http://127.0.0.1:" + port + "/incident"
 
 	return config
 }
